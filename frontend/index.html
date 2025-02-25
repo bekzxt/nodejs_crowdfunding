@@ -1,62 +1,187 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Campaigns - Crowdfunding Platform</title>
-  <link rel="stylesheet" href="css/styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crowdfunding Platform</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="nav.js"></script>
+  <style>
+    /* Reset & Global Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #f4f4f9;
+      color: #333;
+    }
+
+    /* Navbar */
+    .navbar {
+      background: #2c386c;
+      padding: 15px 0;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      width: 100%;
+      z-index: 100;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .navbar a {
+      color: white;
+      text-decoration: none;
+      font-size: 18px;
+      margin: 0 15px;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+    .navbar a:hover {
+      color: #d4f1d4;
+    }
+
+    .hero {
+      background: url('https://source.unsplash.com/1600x600/?startup,technology') center/cover;
+      color: #9f8e41;
+      text-align: center;
+      padding: 80px 20px;
+    }
+    .hero h1 {
+      font-size: 40px;
+      margin-bottom: 10px;
+    }
+    .hero p {
+      font-size: 18px;
+    }
+
+    .projects-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 40px;
+    }
+    .project {
+      width: 320px;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      transition: 0.3s;
+    }
+    .project:hover {
+      transform: translateY(-5px);
+      box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
+    }
+    .project h3 {
+      margin-bottom: 10px;
+    }
+    .project p {
+      font-size: 14px;
+      color: #555;
+    }
+    .project a {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 10px 15px;
+      background: #2c386c;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      transition: 0.3s;
+    }
+    .project a:hover {
+      background: #45a049;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 20px;
+      background: #333;
+      color: white;
+      margin-top: 40px;
+    }
+
+  </style>
 </head>
 <body>
-<header>
-  <h1>Crowdfunding Platform</h1>
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="createCampaign.html">Create Campaign</a>
-    <a href="login.html">Login</a>
-    <a href="register.html">Register</a>
-    <a href="adminDashboard.html">Admin Dashboard</a>
-  </nav>
-</header>
 
-<main>
-  <section id="campaigns">
-    <h2>Active Campaigns</h2>
-    <div id="campaignList">
-      <!-- Campaigns will be dynamically loaded here -->
-    </div>
-  </section>
-</main>
-
-<!-- Donation Modal -->
-<div id="donationModal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2>Donate to Campaign</h2>
-    <form id="donationForm">
-      <input type="hidden" id="donationProjectId" />
-      <label for="donationAmount">Amount:</label>
-      <input type="number" id="donationAmount" required min="1" step="0.01" />
-      <button type="submit">Donate</button>
-    </form>
-    <div id="donationError" class="error"></div>
-    <div id="donationSuccess" class="success"></div>
-  </div>
+<!-- Navbar -->
+<div class="navbar">
+  <a href="register.html">Register</a>
+  <a href="login.html">Login</a>
+  <a href="profile.html">Profile</a>
+  <a href="projects.html">My Projects</a>
 </div>
 
-<script src="js/main.js"></script>
-<script>
-  // Load campaigns on page load
-  document.addEventListener("DOMContentLoaded", loadCampaigns);
+<!-- Hero Section -->
+<div class="hero">
+  <h1>Welcome to the Crowdfunding Platform</h1>
+  <p>Support projects that make a difference</p>
+</div>
 
-  // Modal close functionality
-  const modal = document.getElementById("donationModal");
-  const closeBtn = document.querySelector(".modal-content .close");
-  closeBtn.onclick = () => { modal.style.display = "none"; };
-  window.onclick = (event) => {
-    if (event.target === modal) {
-      modal.style.display = "none";
+<!-- Projects Section -->
+<h2 style="text-align:center; margin-top: 40px;">All Active Projects</h2>
+<div class="projects-container" id="projectsContainer"></div>
+
+<!-- Footer -->
+<div class="footer">
+  <p>&copy; 2025 Crowdfunding Platform. All Rights Reserved.</p>
+</div>
+
+<script>
+  async function fetchAllProjects() {
+    const res = await fetch('http://localhost:5000/api/projects');
+    const projects = await res.json();
+
+    const container = document.getElementById('projectsContainer');
+    container.innerHTML = '';
+
+    projects.forEach(project => {
+      const projectHTML = `
+        <div class="project">
+          <h3>${project.title}</h3>
+          <p><strong>ID:</strong> ${project._id}</p>
+          <p>${project.description}</p>
+          <p><strong>Goal:</strong> $${project.goal}</p>
+          <p><strong>Raised:</strong> $${project.raised}</p>
+          <p><strong>Created by:</strong> ${project.creator.username}</p>
+          <a href="donate.html?projectId=${project._id}">Donate</a>
+        </div>
+      `;
+      container.innerHTML += projectHTML;
+    });
+  }
+  function checkAuth() {
+    const isAuthenticated = localStorage.getItem("token"); // Example: Check if token exists
+    const navbar = document.querySelector(".navbar");
+
+    if (isAuthenticated) {
+      // Hide Register and Login links
+      document.querySelector('a[href="register.html"]').style.display = "none";
+      document.querySelector('a[href="login.html"]').style.display = "none";
+
+      const logoutButton = document.createElement("a");
+      logoutButton.href = "#";
+      logoutButton.innerText = "Logout";
+      logoutButton.style.marginLeft = "15px";
+      logoutButton.onclick = function () {
+        localStorage.removeItem("token"); // Remove token
+        window.location.reload(); // Refresh page
+      };
+
+      navbar.appendChild(logoutButton);
     }
-  };
+  }
+
+  checkAuth();
+
+  fetchAllProjects();
 </script>
+
 </body>
 </html>

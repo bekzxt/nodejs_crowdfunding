@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>User Registration - Crowdfunding Platform</title>
     <link rel="stylesheet" href="css/styles.css" />
+    <style>
+        .container { max-width: 400px; margin: 50px auto; padding: 20px; }
+        form { display: grid; gap: 10px; }
+        input, button { padding: 10px; }
+        button { background: #4CAF50; color: white; border: none; cursor: pointer; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
 </head>
 <body>
 <header>
@@ -16,32 +24,26 @@
 </header>
 
 <main>
-    <section>
+    <section class="container">
+        <h2>Register</h2>
         <form id="registerForm">
-            <label for="username">Username:</label>
-            <input type="text" id="username" required />
-
-            <label for="email">Email:</label>
-            <input type="email" id="email" required />
-
-            <label for="password">Password:</label>
-            <input type="password" id="password" required />
-
-            <label for="confirmPassword">Confirm Password:</label>
-            <input type="password" id="confirmPassword" required />
-
+            <input type="text" placeholder="Username" id="username" required />
+            <input type="email" placeholder="Email" id="email" required />
+            <input type="password" placeholder="Password" id="password" required />
+            <input type="password" placeholder="Confirm Password" id="confirmPassword" required />
             <button type="submit">Register</button>
         </form>
+        <p>Already have an account? <a href="login.html">Login here</a></p>
         <div id="registerError" class="error"></div>
         <div id="registerSuccess" class="success"></div>
     </section>
 </main>
 
-<script src="js/main.js"></script>
 <script>
     document.getElementById("registerForm").addEventListener("submit", async (e) => {
         e.preventDefault();
-        // Clear messages
+
+        // Очистка сообщений
         document.getElementById("registerError").textContent = "";
         document.getElementById("registerSuccess").textContent = "";
 
@@ -50,7 +52,7 @@
         const password = document.getElementById("password").value;
         const confirmPassword = document.getElementById("confirmPassword").value;
 
-        // Basic validation
+        // Проверка пароля
         if (password !== confirmPassword) {
             document.getElementById("registerError").textContent = "Passwords do not match.";
             return;
@@ -59,16 +61,15 @@
         const data = { username, email, password };
 
         try {
-            const response = await fetch("http://localhost:5000/api/auth/register", {
+            const response = await fetch("/api/auth/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data)
             });
             const result = await response.json();
+
             if (response.ok) {
-                document.getElementById("registerSuccess").textContent =
-                    result.message || "Registration successful!";
-                // Optionally redirect to login page after a short delay
+                document.getElementById("registerSuccess").textContent = result.message || "Registration successful!";
                 setTimeout(() => {
                     window.location.href = "login.html";
                 }, 2000);
@@ -76,7 +77,7 @@
                 document.getElementById("registerError").textContent = result.error || result.message;
             }
         } catch (error) {
-            document.getElementById("registerError").textContent = error.message;
+            document.getElementById("registerError").textContent = "Error: " + error.message;
         }
     });
 </script>

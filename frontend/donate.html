@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donations</title>
+    <script src="nav.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+
+        nav {
+            background: #2c386c;
+            padding: 10px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 18px;
+        }
+
+        h2 {
+            margin-top: 20px;
+        }
+        .container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        form {
+            background: white;
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box; /* Учитываем padding и border в ширине */
+            font-size: 16px;
+        }
+
+        button {
+            background: #2c386c;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 12px;
+            border-radius: 5px;
+            display: block;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+    </style>
+</head>
+<body>
+<nav>
+    <a href="index.html">Home</a>
+    <a href="projects.html">My Projects</a>
+    <a href="profile.html">Profile</a>
+    <a href="login.html">Login</a>
+    <a href="register.html">Register</a>
+</nav>
+
+<h2>Make a Donation</h2>
+<form id="donateForm">
+    <label for="amount">Amount:</label>
+    <input type="number" id="amount" required>
+
+    <button type="submit">Donate</button>
+</form>
+
+<h2>All Donations</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Donor</th>
+        <th>Email</th>
+        <th>Project</th>
+        <th>Amount</th>
+        <th>Date</th>
+    </tr>
+    </thead>
+    <tbody id="donationsTable"></tbody>
+</table>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('You must be logged in to access this page.');
+            window.location.href = 'login.html';
+        }
+
+        fetchDonations();
+
+        function checkAuth() {
+            const isAuthenticated = localStorage.getItem("token"); // Example: Check if token exists
+            const navbar = document.querySelector(".navbar");
+
+            if (isAuthenticated) {
+                // Hide Register and Login links
+                document.querySelector('a[href="register.html"]').style.display = "none";
+                document.querySelector('a[href="login.html"]').style.display = "none";
+
+                // Create and add Logout button
+                const logoutButton = document.createElement("a");
+                logoutButton.href = "#";
+                logoutButton.innerText = "Logout";
+                logoutButton.style.marginLeft = "15px";
+                logoutButton.onclick = function () {
+                    localStorage.removeItem("token"); // Remove token
+                    window.location.reload(); // Refresh page
+                };
+
+                navbar.appendChild(logoutButton);
+            }
+        }
+
+        checkAuth();
+
+    });
+
+    function getProjectIdFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get("projectId"); // Get projectId from URL
+    }
+
+    const projectid = getProjectIdFromUrl();
+
+    document.getElementById('donateForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const token = localStorage.getItem('token');
+        if (!token) return alert('You need to login first.');
+
+        const res = await fetch('http://localhost:5000/api/donations', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                projectId: projectid,
+                amount: document.getElementById('amount').value
+            })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+            alert('Donation successful!');
+            fetchDonations();
+        } else {
+            alert(data.message || 'Failed to donate.');
+        }
+    });
+
+
+    async function fetchDonations() {
+
+            const res = await fetch('http://localhost:5000/api/donations', {
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+            });
+            const data = await res.json();
+            const table = document.getElementById('donationsTable');
+            table.innerHTML = '';
+
+            data.forEach(donation => {
+                const row = `<tr>
+                    <td>${donation.donor.username}</td>
+                    <td>${donation.donor.email}</td>
+                    <td>${donation.project ? donation.project.title : 'N/A'}</td>
+                    <td>$${donation.amount}</td>
+                    <td>${new Date(donation.createdAt).toLocaleString()}</td>
+                </tr>`;
+                table.innerHTML += row;
+            });
+
+       }
+</script>
+</body>
+</html>

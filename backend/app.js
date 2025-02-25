@@ -9,7 +9,7 @@ const authRoutes = require('./routes/auth');
 const projectRoutes = require('./routes/project');
 const userRoutes = require('./routes/user');
 const donationRoutes = require('./routes/donations');
-
+const adminRoutes = require('./routes/admin')
 // Initialize Express App
 const app = express();
 
@@ -27,7 +27,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/donations', donationRoutes);
 app.use('/api/users', userRoutes);
-
+app.use('/api/admin', adminRoutes);
 app.use(express.static(path.join(__dirname, '../frontend')));
 
 app.get('*', (req, res) => {
