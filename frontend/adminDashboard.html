@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Dashboard - Crowdfunding Platform</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+<header>
+  <h1>Admin Dashboard</h1>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="login.html">Login</a>
+  </nav>
+</header>
+
+<main>
+  <section>
+    <h2>Stats</h2>
+    <div id="stats">
+      <!-- Stats will be loaded here -->
+    </div>
+  </section>
+
+  <section>
+    <h2>Users</h2>
+    <div id="usersList">
+      <!-- Users list loaded here -->
+    </div>
+  </section>
+
+  <section>
+    <h2>Projects</h2>
+    <div id="projectsList">
+      <!-- Projects list loaded here -->
+    </div>
+  </section>
+
+  <section>
+    <h2>Donations</h2>
+    <div id="donationsList">
+      <!-- Donations list loaded here -->
+    </div>
+  </section>
+
+  <div id="adminError" class="error"></div>
+</main>
+
+<script src="js/main.js"></script>
+<script>
+  const token = localStorage.getItem("token");
+  if (!token) {
+    document.getElementById("adminError").textContent =
+            "You must be logged in as admin to access this page.";
+  } else {
+    loadAdminDashboard();
+  }
+</script>
+</body>
+</html>

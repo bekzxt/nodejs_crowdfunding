@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Create Campaign - Crowdfunding Platform</title>
+    <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+<header>
+    <h1>Create Campaign</h1>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="login.html">Login</a>
+        <a href="register.html">Register</a>
+    </nav>
+</header>
+
+<main>
+    <section>
+        <form id="campaignForm">
+            <label for="title">Campaign Title:</label>
+            <input type="text" id="title" required />
+
+            <label for="description">Description:</label>
+            <textarea id="description" required></textarea>
+
+            <label for="goal">Funding Goal (USD):</label>
+            <input type="number" id="goal" required min="1" step="0.01" />
+
+            <button type="submit">Create Campaign</button>
+        </form>
+        <div id="campaignError" class="error"></div>
+        <div id="campaignSuccess" class="success"></div>
+    </section>
+</main>
+
+<script src="js/main.js"></script>
+<script>
+    document.getElementById("campaignForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        document.getElementById("campaignError").textContent = "";
+        document.getElementById("campaignSuccess").textContent = "";
+
+        const token = localStorage.getItem("token");
+        if (!token) {
+            document.getElementById("campaignError").textContent =
+                "You must be logged in to create a campaign.";
+            return;
+        }
+
+        const title = document.getElementById("title").value.trim();
+        const description = document.getElementById("description").value.trim();
+        const goal = parseFloat(document.getElementById("goal").value);
+
+        if (title === "" || description === "" || isNaN(goal) || goal <= 0) {
+            document.getElementById("campaignError").textContent =
+                "Please provide valid campaign details.";
+            return;
+        }
+
+        const data = { title, description, goal };
+
+        try {
+            const response = await fetch("http://localhost:5000/api/projects", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + token
+                },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            if (response.ok) {
+                document.getElementById("campaignSuccess").textContent =
+                    "Campaign created successfully!";
+                document.getElementById("campaignForm").reset();
+            } else {
+                document.getElementById("campaignError").textContent =
+                    result.message || result.error;
+            }
+        } catch (error) {
+            document.getElementById("campaignError").textContent = error.message;
+        }
+    });
+</script>
+</body>
+</html>

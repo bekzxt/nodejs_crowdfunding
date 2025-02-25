@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Campaigns - Crowdfunding Platform</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+<header>
+  <h1>Crowdfunding Platform</h1>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="createCampaign.html">Create Campaign</a>
+    <a href="login.html">Login</a>
+    <a href="register.html">Register</a>
+    <a href="adminDashboard.html">Admin Dashboard</a>
+  </nav>
+</header>
+
+<main>
+  <section id="campaigns">
+    <h2>Active Campaigns</h2>
+    <div id="campaignList">
+      <!-- Campaigns will be dynamically loaded here -->
+    </div>
+  </section>
+</main>
+
+<!-- Donation Modal -->
+<div id="donationModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Donate to Campaign</h2>
+    <form id="donationForm">
+      <input type="hidden" id="donationProjectId" />
+      <label for="donationAmount">Amount:</label>
+      <input type="number" id="donationAmount" required min="1" step="0.01" />
+      <button type="submit">Donate</button>
+    </form>
+    <div id="donationError" class="error"></div>
+    <div id="donationSuccess" class="success"></div>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+<script>
+  // Load campaigns on page load
+  document.addEventListener("DOMContentLoaded", loadCampaigns);
+
+  // Modal close functionality
+  const modal = document.getElementById("donationModal");
+  const closeBtn = document.querySelector(".modal-content .close");
+  closeBtn.onclick = () => { modal.style.display = "none"; };
+  window.onclick = (event) => {
+    if (event.target === modal) {
+      modal.style.display = "none";
+    }
+  };
+</script>
+</body>
+</html>
