@@ -58,7 +58,7 @@ if (document.getElementById("donationForm")) {
         const data = { amount, projectId };
 
         try {
-            const response = await fetch("http://localhost:5000/api/donations", {
+            const response = await fetch("/api/donations", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -91,7 +91,7 @@ async function loadAdminDashboard() {
 
     // Load Stats
     try {
-        const statsResponse = await fetch("http://localhost:5000/api/admin/stats", {
+        const statsResponse = await fetch("/api/admin/stats", {
             headers: { Authorization: "Bearer " + token }
         });
         const stats = await statsResponse.json();

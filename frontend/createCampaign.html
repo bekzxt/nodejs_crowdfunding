@@ -62,7 +62,7 @@
         const data = { title, description, goal };
 
         try {
-            const response = await fetch("http://localhost:5000/api/projects", {
+            const response = await fetch("/api/projects", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

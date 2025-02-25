@@ -186,7 +186,7 @@
         const token = localStorage.getItem('token');
         if (!token) return alert('You need to login first.');
 
-        const res = await fetch('http://localhost:5000/api/donations', {
+        const res = await fetch('/api/donations', {
             method: 'POST',
             headers: {
                 'Authorization': 'Bearer ' + token,
@@ -210,7 +210,7 @@
 
     async function fetchDonations() {
 
-            const res = await fetch('http://localhost:5000/api/donations', {
+            const res = await fetch('/api/donations', {
                 headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
             });
             const data = await res.json();
