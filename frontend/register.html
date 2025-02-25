@@ -1,0 +1,53 @@
+<!-- frontend/register.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+    <style>
+        .container { max-width: 400px; margin: 50px auto; padding: 20px; }
+        form { display: grid; gap: 10px; }
+        input { padding: 8px; }
+        button { padding: 10px; background: #4CAF50; color: white; border: none; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Register</h2>
+    <form id="registerForm">
+        <input type="text" placeholder="Username" id="username" required>
+        <input type="email" placeholder="Email" id="email" required>
+        <input type="password" placeholder="Password" id="password" required>
+        <button type="submit">Register</button>
+    </form>
+    <p>Already have an account? <a href="/login.html">Login here</a></p>
+</div>
+
+<script>
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const user = {
+            username: document.getElementById('username').value,
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value
+        };
+
+        try {
+            const response = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(user)
+            });
+
+            if (response.ok) {
+                window.location.href = '/login.html';
+            } else {
+                alert('Registration failed');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    });
+</script>
+</body>
+</html>
