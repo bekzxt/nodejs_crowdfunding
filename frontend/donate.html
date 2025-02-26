@@ -179,12 +179,22 @@
         return params.get("projectId"); // Get projectId from URL
     }
 
-    const projectid = getProjectIdFromUrl();
 
     document.getElementById('donateForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const token = localStorage.getItem('token');
         if (!token) return alert('You need to login first.');
+        const projectid = getProjectIdFromUrl();
+
+        const amount = parseFloat(document.getElementById('amount').value); // Приводим к числу
+
+        if (isNaN(amount) || amount <= 0) {
+            return alert('Invalid donation amount');
+        }
+        const donationData = {
+            projectId: projectid,
+            amount: amount
+        };
 
         const res = await fetch('/api/donations', {
             method: 'POST',
@@ -192,10 +202,7 @@
                 'Authorization': 'Bearer ' + token,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                projectId: projectid,
-                amount: document.getElementById('amount').value
-            })
+            body:  JSON.stringify(donationData)
         });
 
         const data = await res.json();
